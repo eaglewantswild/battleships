@@ -1,0 +1,97 @@
+/*
+ * Standalone Battleship styles. No external CSS frameworks, fonts, or images.
+ * Layout principle: each board is a square inside a CSS-grid coordinate frame.
+ * When panels stack, their heights follow the square board automatically.
+ * All colours can be changed in the :root variables below.
+ */
+:root {
+  color-scheme: dark;
+  --page: #21180f;
+  --surface: #302416;
+  --surface-light: #3c2b1a;
+  --border: #72502b;
+  --orange: #f39b30;
+  --orange-bright: #ffc16a;
+  --text: #eed8b6;
+  --muted: #bc9e78;
+  --water: #ece0c8;
+  --axis: 26px;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: radial-gradient(ellipse at top,#392717,var(--page) 65%); color: var(--text); font: 15px/1.55 Verdana, Geneva, sans-serif; }
+button { font: inherit; }
+button:focus-visible { outline: 3px solid #ffcc78; outline-offset: 2px; }
+.site-wrap { width: min(1100px, calc(100% - 28px)); margin: 0 auto; }
+.site-header { margin-top: 22px; padding: 27px 29px; border: 1px solid #8d581f; border-radius: 10px 10px 0 0; background: linear-gradient(115deg,#472910,#302114); }
+.eyebrow { margin: 0 0 5px; font-size: 11px; font-weight: 700; letter-spacing: .15em; color: var(--orange); }
+h1 { margin: 0; color: #fff0d5; font-size: clamp(30px,5vw,49px); line-height: 1.1; }
+.lead { max-width: 720px; margin: 12px 0 0; color: #e1c19b; }
+.instructions { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; padding: 20px 2px; }
+.instructions > div { border-left: 3px solid #c47b2b; padding: 0 15px; }
+.instructions h2 { margin: 0 0 3px; font-size: 15px; color: var(--orange-bright); }
+.instructions p { margin: 0; font-size: 13px; color: var(--muted); }
+.instructions strong { color: #eed6af; }
+.game { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: clamp(12px, 2vw, 22px); }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.toolbar button, .modal-card button { border: 1px solid #a77537; border-radius: 5px; padding: 9px 13px; color: #fff2dc; background: #66411f; font-size: 13px; font-weight: bold; cursor: pointer; }
+.toolbar button:hover:not(:disabled), .modal-card button:hover { background: #855221; }
+.toolbar button.primary, .modal-card button.primary { background: #a65c16; border-color: #f2a14b; }
+.toolbar button.primary:hover:not(:disabled), .modal-card button.primary:hover { background: #be751f; }
+.toolbar button:disabled { opacity: .45; cursor: not-allowed; }
+.status { min-height: 52px; padding: 12px 14px; margin: 0 0 18px; border: 1px solid #73532e; background: #1f180f; border-radius: 5px; color: #f0d3a5; }
+.game-panels { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 18px; align-items: start; }
+.game-panel { min-width: 0; border: 1px solid #72502a; border-radius: 8px; background: #271d13; overflow: hidden; }
+.panel-title { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #493019; border-bottom: 1px solid #96602b; padding: 11px 14px; }
+.panel-title h2 { margin: 0; font-size: 18px; color: #ffbd71; }
+.panel-title span { font-size: 10px; letter-spacing: .15em; font-weight: bold; color: #cba676; }
+.panel-inner { padding: 14px 12px 16px; }
+.panel-inner h3 { max-width: 440px; margin: 15px auto 5px; color: #ffd097; font-size: 13px; }
+.coordinate-frame { display: grid; grid-template-columns: var(--axis) minmax(0,1fr); grid-template-rows: var(--axis) auto; width: min(100%, 466px); margin-inline: auto; }
+.corner { grid-column: 1; grid-row: 1; }
+.axis { display: grid; color: #d5b48c; font-size: clamp(9px,1.2vw,12px); text-align: center; font-weight: bold; user-select: none; }
+.axis-top { grid-column: 2; grid-row: 1; grid-template-columns: repeat(10,minmax(0,1fr)); align-items: center; }
+.axis-left { grid-column: 1; grid-row: 2; grid-template-rows: repeat(10,minmax(0,1fr)); align-items: center; }
+.board-shell { grid-column: 2; grid-row: 2; position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: var(--water); border: 1px solid #8c7255; isolation: isolate; }
+.signal-image, .signal-mask, .ship-layer, .board, .hit-layer { position: absolute; inset: 0; width: 100%; height: 100%; }
+.signal-image { z-index: 0; object-fit: fill; image-rendering: auto; background: #e8dcc5; }
+.signal-mask { z-index: 1; pointer-events: none; }
+.ship-layer { z-index: 2; pointer-events: none; }
+.board { z-index: 3; display: grid; grid-template-columns: repeat(10,minmax(0,1fr)); grid-template-rows: repeat(10,minmax(0,1fr)); }
+.hit-layer { z-index: 4; pointer-events: none; }
+.cell { appearance: none; border: 1px dashed rgba(94,65,38,.26); background: transparent; padding: 0; width: 100%; min-width: 0; height: 100%; min-height: 0; position: relative; cursor: default; color: inherit; }
+.cell.is-actionable { cursor: crosshair; }
+.cell.is-actionable:hover { box-shadow: inset 0 0 0 2px rgba(242,153,53,.7); }
+.cell:disabled { opacity: 1; }
+.cell.pending-start { box-shadow: inset 0 0 0 3px #ffd179; background: rgba(255,205,121,.18); }
+.cell.preview-ok { box-shadow: inset 0 0 0 2px rgba(71,132,91,.85); background: rgba(118,169,115,.16); }
+.cell.preview-bad { box-shadow: inset 0 0 0 2px #b64c39; background: rgba(196,57,34,.12); }
+.player-shell .cell.is-ship { background: rgba(61,106,78,.10); }
+.cell.is-hit { background: rgba(180,50,25,.10); }
+.cell.is-hit::before { content: ""; position: absolute; inset: 30%; border-radius: 50%; background: #c95725; opacity: .5; }
+.cell.is-miss::before, .cell.is-miss::after { content:""; position:absolute; width:58%; height:2px; top:50%; left:50%; border-radius: 2px; background:#a56420; transform:translate(-50%,-50%) rotate(45deg); }
+.cell.is-miss::after { transform:translate(-50%,-50%) rotate(-45deg); }
+.ship-sprite { position:absolute; object-fit:contain; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(0,0,0,.5)); }
+.hit-sprite { position:absolute; width:10%; height:10%; object-fit:contain; pointer-events:none; }
+.fleet-list { max-width: 440px; margin: 0 auto; border-top: 1px solid rgba(188,158,120,.23); }
+.fleet-row { width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 9px; border:0; border-bottom:1px solid rgba(188,158,120,.16); background:transparent; color:#ddbc8c; text-align:left; font-size:13px; }
+button.fleet-row { cursor:pointer; }
+button.fleet-row:hover:not(:disabled), .fleet-row.active { background: rgba(228,151,43,.14); color:#ffbd69; }
+.fleet-row.placed { color: #a49276; }
+.fleet-row.placed .fleet-name { text-decoration: line-through; }
+.fleet-row.sunk { opacity: .55; }
+.fleet-row strong { font-size:12px; }
+.game-tip { margin:16px 0 0; color:#bda381; font-size:12px; text-align:center; }
+.sonar-ping { position:absolute; z-index:5; border:2px solid rgba(255,153,32,.96); border-radius:50%; width:8px; height:8px; transform:translate(-50%,-50%); pointer-events:none; animation:sonar-ping .7s ease-out forwards; }
+@keyframes sonar-ping { from { width:8px; height:8px; opacity:1; } to { width:100px; height:100px; opacity:0; } }
+.footer { padding:23px 10px 30px; color:#a58b6a; text-align:center; font-size:12px; }
+.footer code { color:#d6b37e; }
+.modal[hidden] { display:none; }
+.modal { position:fixed; z-index:100; inset:0; overflow-y:auto; display:grid; place-items:center; padding:18px; background:rgba(15,10,5,.88); }
+.modal-card { width:min(530px,100%); padding:20px; background:#302214; border:2px solid #c37b30; border-radius:10px; box-shadow:0 16px 45px #0009; text-align:center; }
+.modal-card h2 { color:#ffd6a0; margin:0 0 7px; }
+.modal-card p:not(.eyebrow) { margin:0 0 12px; color:#d3b792; }
+.modal-card img { display:block; width:min(400px,100%); max-height:min(55vh,400px); aspect-ratio:1; object-fit:contain; background:#fff; margin:0 auto 16px; }
+@media (max-width: 800px) { .game-panels { grid-template-columns: 1fr; } .game-panel { width:100%; } }
+@media (max-width: 550px) { .instructions { grid-template-columns:1fr; } .site-header { padding:20px 19px; } .toolbar button { flex:1 1 135px; } .panel-inner { padding:12px 8px 16px; } .panel-title h2 { font-size:17px; } }
+@media (prefers-reduced-motion: reduce) { .sonar-ping { animation:none; opacity:.5; width:40px; height:40px; } }

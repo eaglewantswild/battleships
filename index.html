@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#21180f">
+  <meta name="description" content="A standalone Battleship game with a hidden signal to recover.">
+  <title>Battleship | Recover the Signal</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <main class="site-wrap">
+    <header class="site-header">
+      <p class="eyebrow">NAVAL OPERATIONS / SIGNAL RECOVERY</p>
+      <h1>Battleship</h1>
+      <p class="lead">Deploy your fleet. Hunt the enemy ships. Every successful hit clears a little more interference from a hidden signal.</p>
+    </header>
+
+    <section class="instructions" aria-label="How to play">
+      <div>
+        <h2>Place your fleet</h2>
+        <p>Choose a ship in your fleet list, then click its first and last squares. Or use <strong>Auto-place fleet</strong>. Select a placed ship to remove it.</p>
+      </div>
+      <div>
+        <h2>Take your shots</h2>
+        <p>Press <strong>Start battle</strong> when all five ships are placed. Fire on Enemy Waters, sink the opposing fleet and recover the complete signal.</p>
+      </div>
+    </section>
+
+    <section class="game" aria-label="Battleship game">
+      <div class="toolbar" aria-label="Game controls">
+        <button id="autoPlaceBtn" type="button">Auto-place fleet</button>
+        <button id="resetPlacementBtn" type="button">Clear fleet</button>
+        <button id="startBtn" class="primary" type="button" disabled>Start battle</button>
+        <button id="newGameBtn" type="button">New game</button>
+      </div>
+
+      <p id="status" class="status" role="status" aria-live="polite">Place your fleet to begin.</p>
+
+      <div class="game-panels">
+        <!-- Each coordinate-frame uses CSS grid: its axes and board scale together.
+             This avoids the fixed-height overlap in the original site version. -->
+        <section class="game-panel" aria-labelledby="playerTitle">
+          <div class="panel-title"><h2 id="playerTitle">Your Fleet</h2><span>FRIENDLY</span></div>
+          <div class="panel-inner">
+            <div class="coordinate-frame">
+              <div class="corner" aria-hidden="true"></div>
+              <div class="axis axis-top" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+              <div class="axis axis-left" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+              <div id="playerShell" class="board-shell player-shell">
+                <div id="playerShipsLayer" class="ship-layer" aria-hidden="true"></div>
+                <div id="playerBoard" class="board" role="group" aria-label="Your fleet placement grid"></div>
+                <div id="playerHitsLayer" class="hit-layer" aria-hidden="true"></div>
+              </div>
+            </div>
+            <h3>Ships to deploy</h3>
+            <div id="playerFleet" class="fleet-list"></div>
+          </div>
+        </section>
+
+        <section class="game-panel" aria-labelledby="enemyTitle">
+          <div class="panel-title"><h2 id="enemyTitle">Enemy Waters</h2><span>HOSTILE</span></div>
+          <div class="panel-inner">
+            <div class="coordinate-frame">
+              <div class="corner" aria-hidden="true"></div>
+              <div class="axis axis-top" aria-hidden="true"><span>A</span><span>B</span><span>C</span><span>D</span><span>E</span><span>F</span><span>G</span><span>H</span><span>I</span><span>J</span></div>
+              <div class="axis axis-left" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+              <div id="enemyShell" class="board-shell enemy-shell">
+                <img id="signalImage" class="signal-image" alt="" draggable="false">
+                <canvas id="signalMask" class="signal-mask" aria-hidden="true"></canvas>
+                <div id="enemyShipsLayer" class="ship-layer" aria-hidden="true"></div>
+                <div id="enemyBoard" class="board" role="group" aria-label="Enemy waters attack grid"></div>
+                <div id="enemyHitsLayer" class="hit-layer" aria-hidden="true"></div>
+              </div>
+            </div>
+            <h3>Enemy ship status</h3>
+            <div id="enemyFleet" class="fleet-list"></div>
+          </div>
+        </section>
+      </div>
+      <p class="game-tip">Coordinates: columns A-J, rows 1-10. Only one shot per turn. No shots are transmitted to a server.</p>
+    </section>
+
+    <footer class="footer">Standalone Battleship demo &middot; Edit <code>config.js</code> to supply your own images.</footer>
+  </main>
+
+  <!-- The full signal is displayed only when the enemy fleet is destroyed.
+       Note: the image file itself is public on the server; see README.md. -->
+  <div id="signalModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="signalTitle" hidden>
+    <div class="modal-card">
+      <p class="eyebrow">MISSION COMPLETE</p>
+      <h2 id="signalTitle">Signal recovered</h2>
+      <p>All enemy ships have been sunk. The complete image is now visible.</p>
+      <img id="signalPopupImage" alt="Recovered full signal">
+      <button id="closeSignalBtn" type="button" class="primary">Close</button>
+    </div>
+  </div>
+
+  <!-- Keep scripts at the end: game.js needs the DOM elements above. -->
+  <script src="./config.js"></script>
+  <script src="./game.js"></script>
+</body>
+</html>
